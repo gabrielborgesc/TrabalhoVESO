@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+
 using namespace std;
 
 int t = 0;
@@ -8,6 +10,7 @@ class teste{
 public: int x;
         int y;
         int z = 5;
+        vector <int> v;
 
 
         void print() {
@@ -21,6 +24,16 @@ public: int x;
         void somax(){
         x++;
         }
+
+        bool empty(){
+        return v.empty();
+            }
+
+        int size() {
+            return v.size();
+        }
+
+
 };
 
 class teste2 : public teste{
@@ -35,21 +48,30 @@ class teste2 : public teste{
     }
 };
 
+
+void f(teste &t){
+    t.x++;
+}
+
 int main () {
 
-teste t1;
-t1.x = 3;
-t1.y = 3;
+teste t1, t2, t3, t4;
+t1.x = 1;
+t2.x = 2;
+t3 = t2;
 
-teste2 t2;
-t2.x = 3;
-t2.y = 3;
+vector<teste> v;
+v.push_back(t1);
+v.push_back(t2);
+v.push_back(t3);
 
-t1.somax();
-t2.somax();
+for(int i=0; i<v.size(); i++){
+    cout<<v[i].x<<"  ";
+}
 
-t1.print();
-t2.print();
+
+
+
 
 return 0;
 }
