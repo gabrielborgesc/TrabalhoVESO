@@ -8,7 +8,7 @@ int t = 0;
 
 class teste{
 public: int x;
-        int y;
+        static int y;
         int z = 5;
         vector <int> v;
 
@@ -55,19 +55,11 @@ void f(teste &t){
 
 int main () {
 
-teste t1, t2, t3, t4;
+teste t1, t2;
+
+
 t1.x = 1;
-t2.x = 2;
-t3 = t2;
-
-vector<teste> v;
-v.push_back(t1);
-v.push_back(t2);
-v.push_back(t3);
-
-for(int i=0; i<v.size(); i++){
-    cout<<v[i].x<<"  ";
-}
+t2.x = 5;
 
 
 

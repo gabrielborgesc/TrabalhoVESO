@@ -4,11 +4,12 @@
 using namespace std;
 
 int t = 0; ///instante em ms da simulação (variável global)
-
+int lastt = 0; ///instante em ms da última mudança na configuração das filas (variável global)
 enum filas {
     Q0,
     Q1,
-    ES
+    ES,
+    TERM
 };
 
 class proc{
@@ -26,21 +27,12 @@ public:
     int res; /// qauntidade restante de operações de E/S do processo
     int term; ///instante em que processo terminou toda sua execução
     filas f; ///fila à qual pertence o processo
-
-    void ex() { ///método que represnta execução de 1ms do processo
-    rbcpu--;
-    tex = t - tiex;
-    }
-
-    void es(){ ///método que represnta execução de 1ms de op de E/S do processo
-    tes = t - ties;
-    }
-
 };
 
 class fila0{ ///classe para fila Q0 e fila de terminados
 private:
     static const int trr = 10;
+
 
 public:
     vector <proc> p;
@@ -114,7 +106,7 @@ public:
 
 class filaes : public fila0 { ///classe para fila de E/S
 private:
-    static const int totales = 2; ///duração de todas as op de E/S
+    static const int totales = 20; ///duração de todas as op de E/S
 
 public:
      bool fex() { ///método que verifica fim de op de E/S
@@ -134,6 +126,7 @@ public:
         if(!p.empty()){
             p[0].ties = t;
         }
+        paux.f = Q0;
         q0.ins(paux);
     }
 };
@@ -170,6 +163,7 @@ public:
         p.erase(p.begin());
         paux.tiq1 = t;
         paux.tq1 = 0;
+        paux.f = Q1;
         q1.ins(paux);
     }
 
@@ -181,6 +175,7 @@ public:
         paux.ties = t;
         }
         paux.tes = 0;
+        paux.f = ES;
         es.ins(paux);
     }
 
@@ -189,6 +184,7 @@ public:
         proc paux = p[0];
         p.erase(p.begin());
         paux.term = t;
+        paux.f = TERM;
         term.ins(paux);
     }
 
@@ -208,47 +204,62 @@ public:
 
 };
 
+bool operator==(fila0 q, fila0 aux){
+        vector <int> v, vaux;
+        int i;
+        for(i=0; i<q.size(); i++){
+            v.push_back(q.p[i].id);
+        }
 
-void print(fila0 q0, fila1 q1, filaex ex, filaes es, fila0 term){
+        for(i=0; i<aux.size(); i++){
+            vaux.push_back(aux.p[i].id);
+        }
+        return v==vaux;
+    }
+
+void print(fila0 q0, fila1 q1, filaex ex, filaes es, fila0 term, fila0 auxq0, fila1 auxq1, filaex auxex, filaes auxes, fila0 auxterm){
 int i;
+if(!(q0==auxq0 && q1==auxq1 && ex==auxex && es==es && term==auxterm)){
 cout<<endl;
-cout<<"t = "<<t<<" - "<<t+1<<":"<<endl;
+cout<<"t = "<<lastt<<" - "<<t<<":"<<endl;
 cout<<"em execucao: ";
-for(i=0; i<ex.size(); i++){
-    cout<<"   P"<<ex.p[i].id;
+for(i=0; i<auxex.size(); i++){
+    cout<<"   P"<<auxex.p[i].id;
 }
 
 cout<<endl<<"Fila Q0:";
-for(i=0; i<q0.size(); i++){
-    cout<<"   P"<<q0.p[i].id;
+for(i=0; i<auxq0.size(); i++){
+    cout<<"   P"<<auxq0.p[i].id<<"  rbcpu = "<<auxex.p[0].rbcpu;
 }
 
 cout<<endl<<"Fila Q1:";
-for(i=0; i<q1.size(); i++){
-    cout<<"   P"<<q1.p[i].id;
+for(i=0; i<auxq1.size(); i++){
+    cout<<"   P"<<auxq1.p[i].id<<"  rbcpu = "<<auxex.p[0].rbcpu;
 }
 
 cout<<endl<<"Fila E/S:";
-for(i=0; i<es.size(); i++){
-    cout<<"   P"<<es.p[i].id;
+for(i=0; i<auxes.size(); i++){
+    cout<<"   P"<<auxes.p[i].id;
 }
 
 cout<<endl<<"Fila term:";
-for(i=0; i<term.size(); i++){
-    cout<<"   P"<<term.p[i].id;
+for(i=0; i<auxterm.size(); i++){
+    cout<<"   P"<<auxterm.p[i].id;
 }
 cout<<endl;
+lastt = t;
+}
 }
 
 int main () {
 
 int i, x, idex, qtproc; ///quantidade total de processos
 
-fila0 q0; ///fila Q0
-fila1 q1; ///fila Q1
-filaex ex; ///fila de execução (apenas 1 processo nesse vetor). É vetor apenas para verificar com empty array se há processo em execução ou não
-filaes es; ///fila de E/S
-fila0 term; ///fila de processos terminados
+fila0 q0, auxq0; ///fila Q0
+fila1 q1, auxq1; ///fila Q1
+filaex ex, auxex; ///fila de execução (apenas 1 processo nesse vetor). É vetor apenas para verificar com empty array se há processo em execução ou não
+filaes es, auxes; ///fila de E/S
+fila0 term, auxterm; ///fila de processos terminados
 
 vector <int> dscpu; ///vetor com a duração de brust cpu de cada processo
 vector <int> qesp; ///vetor com a quantidade de op de E/S de cada processo
@@ -289,12 +300,16 @@ cout<<endl<<endl;
         aux.tiex = t;
         ex.ins(aux);
 
-print(q0, q1, ex, es, term);
+///print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm);
 
 while(1){
 t++;
 if(q0.empty() && q1.empty() && es.empty()) break;
-
+auxq0 = q0;
+auxq1 = q1;
+auxex = ex;
+auxes = es;
+auxterm = term;
 ///atualizando tempos de execução/espera
 ex.update();
 
@@ -352,13 +367,13 @@ if(!es.empty()){
 if(ex.empty()){ ///ninguém está em execução
     if(!q0.empty()){
         aux = q0.p[0];
+        aux.rbcpu = aux.bcpu;
     }
     else if(!q1.empty()){
         aux = q1.p[0];
     }
 
     if(!q0.empty() || !q1.empty()){
-        aux.rbcpu = aux.bcpu;
         aux.tiex = t;
         aux.tex = 0;
         ex.ins(aux);
@@ -366,7 +381,7 @@ if(ex.empty()){ ///ninguém está em execução
 
 }
 
-print(q0, q1, ex, es, term);
+print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm);
 
 }
 return 0;
