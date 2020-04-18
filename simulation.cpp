@@ -122,14 +122,18 @@ public:
     }
 
     void update() {
-        if(!p.empty())
+        if(!p.empty()){
         p[0].tes = t - p[0].ties;
+    }
     }
 
     void moveEStoQ0(fila0 &q0){
         proc paux = p[0];
         paux.res--;
         p.erase(p.begin());
+        if(!p.empty()){
+            p[0].ties = t;
+        }
         q0.ins(paux);
     }
 };
@@ -165,6 +169,7 @@ public:
         proc paux = p[0];
         p.erase(p.begin());
         paux.tiq1 = t;
+        paux.tq1 = 0;
         q1.ins(paux);
     }
 
@@ -172,7 +177,10 @@ public:
         q0.pop();
         proc paux = p[0];
         p.erase(p.begin());
+        if(es.empty()){
         paux.ties = t;
+        }
+        paux.tes = 0;
         es.ins(paux);
     }
 
@@ -191,6 +199,7 @@ public:
         for(int i=0; i<q1.size(); i++){
             if(q1.p[i].id == paux.id){
                 paux.tiq1 = t;
+                paux.tq1 = 0;
                 q1.p[i] = paux;
                 break;
             }
@@ -203,7 +212,7 @@ public:
 void print(fila0 q0, fila1 q1, filaex ex, filaes es, fila0 term){
 int i;
 cout<<endl;
-cout<<"t = "<<t<<":"<<endl;
+cout<<"t = "<<t<<" - "<<t+1<<":"<<endl;
 cout<<"em execucao: ";
 for(i=0; i<ex.size(); i++){
     cout<<"   P"<<ex.p[i].id;
@@ -274,10 +283,16 @@ for(i=0; i<qtproc; i++){ ///criando os processos e adicionando-os à fila Q0
 }
 
 cout<<endl<<endl;
-int cont = 0;
+
+        aux = q0.p[0];
+        aux.rbcpu = aux.bcpu;
+        aux.tiex = t;
+        ex.ins(aux);
+
+print(q0, q1, ex, es, term);
+
 while(1){
-cont++;
-if(cont==10) break;
+t++;
 if(q0.empty() && q1.empty() && es.empty()) break;
 
 ///atualizando tempos de execução/espera
@@ -294,26 +309,8 @@ q1.update(idex);
 es.update();
 
 ///tratando ex
-if(ex.empty()){ ///ninguém está em execução
-    if(!q0.empty()){
-        aux = q0.p[0];
-    }
-    else if(!q1.empty()){
-        aux = q1.p[0];
-    }
+if(!ex.empty()) { ///existe processo em execução
 
-    if(!q0.empty() || !q1.empty()){
-        aux.rbcpu = aux.bcpu;
-        aux.tiex = t;
-        ex.ins(aux);
-    }
-        print(q0, q1, ex, es, term);
-}
-
-
-
-else { ///existe processo em execução
-print(q0, q1, ex, es, term);
 if(ex.fexrr()){ ///processo que está em execução é de Q0 e terminou por RR
 ex.moveQ0toQ1(q0, q1); ///move processo da fila Q0 para Q1
 }
@@ -352,8 +349,25 @@ if(!es.empty()){
     }
 }
 
+if(ex.empty()){ ///ninguém está em execução
+    if(!q0.empty()){
+        aux = q0.p[0];
+    }
+    else if(!q1.empty()){
+        aux = q1.p[0];
+    }
 
-t++;
+    if(!q0.empty() || !q1.empty()){
+        aux.rbcpu = aux.bcpu;
+        aux.tiex = t;
+        aux.tex = 0;
+        ex.ins(aux);
+    }
+
+}
+
+print(q0, q1, ex, es, term);
+
 }
 return 0;
 }
