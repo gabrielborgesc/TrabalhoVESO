@@ -218,9 +218,39 @@ bool operator==(fila0 q, fila0 aux){
         return v==vaux;
     }
 
-void print(fila0 q0, fila1 q1, filaex ex, filaes es, fila0 term, fila0 auxq0, fila1 auxq1, filaex auxex, filaes auxes, fila0 auxterm){
+void print(fila0 q0, fila1 q1, filaex ex, filaes es, fila0 term, fila0 auxq0, fila1 auxq1, filaex auxex, filaes auxes, fila0 auxterm, bool fim){
 int i;
-if(!(q0==auxq0 && q1==auxq1 && ex==auxex && es==es && term==auxterm)){
+
+if(fim){
+cout<<endl;
+cout<<"t = "<<t-1<<" (fim) "<<endl;
+cout<<"em execucao: ";
+for(i=0; i<ex.size(); i++){
+    cout<<"   P"<<ex.p[i].id;//<<"  rbcpu: "<<auxex.p[i].rbcpu<<"  f = "<<auxex.p[i].f<<"   ";
+}
+
+cout<<endl<<"Fila Q0:";
+for(i=0; i<q0.size(); i++){
+    cout<<"   P"<<q0.p[i].id;//<<"  rbcpu: "<<auxq0.p[i].rbcpu<<"  f = "<<auxq0.p[i].f<<"   ";
+}
+
+cout<<endl<<"Fila Q1:";
+for(i=0; i<q1.size(); i++){
+    cout<<"   P"<<q1.p[i].id;//<<"  rbcpu: "<<auxq1.p[i].rbcpu<<"  f = "<<auxq1.p[i].f<<"   ";
+}
+
+cout<<endl<<"Fila E/S:";
+for(i=0; i<es.size(); i++){
+    cout<<"   P"<<es.p[i].id;
+}
+
+cout<<endl<<"Fila term:";
+for(i=0; i<term.size(); i++){
+    cout<<"   P"<<term.p[i].id;
+}
+cout<<endl;
+}
+else if(!(q0==auxq0 && q1==auxq1 && ex==auxex && es==es && term==auxterm)){
 cout<<endl;
 cout<<"t = "<<lastt<<" - "<<t<<":"<<endl;
 cout<<"em execucao: ";
@@ -305,7 +335,10 @@ cout<<endl<<endl;
 
 while(1){
 t++;
-if(q0.empty() && q1.empty() && es.empty()) break;
+if(q0.empty() && q1.empty() && es.empty()){
+print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm, true);
+break;
+}
 auxq0 = q0;
 auxq1 = q1;
 auxex = ex;
@@ -387,7 +420,7 @@ if(ex.empty()){ ///ninguém está em execução
 
 }
 
-print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm);
+print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm, false);
 
 }
 return 0;
