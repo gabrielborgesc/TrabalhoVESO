@@ -97,6 +97,7 @@ public:
         }
 
         for(i=0; i<paux.size(); i++){ ///inserindo esses processos em Q0
+            paux[i].f=Q0;
             q0.ins(paux[i]);
         }
 
@@ -146,7 +147,7 @@ public:
         return p[0].f == Q1 && fex();
     }
 
-    bool stop(fila0 q0) { ///método que indica se processo em execução é de Q1 e foi interrompido porque chegou processo em Q0
+    bool stop(fila0 q0) { ///método que indica se processo em execução é de Q1 e deve ser interrompido porque chegou processo em Q0
         return !p.empty() && !q0.empty() && (p[0].id != q0.p[0].id) && (p[0].f = Q1);
     }
 
@@ -224,17 +225,17 @@ cout<<endl;
 cout<<"t = "<<lastt<<" - "<<t<<":"<<endl;
 cout<<"em execucao: ";
 for(i=0; i<auxex.size(); i++){
-    cout<<"   P"<<auxex.p[i].id;
+    cout<<"   P"<<auxex.p[i].id;//<<"  rbcpu: "<<auxex.p[i].rbcpu<<"  f = "<<auxex.p[i].f<<"   ";
 }
 
 cout<<endl<<"Fila Q0:";
 for(i=0; i<auxq0.size(); i++){
-    cout<<"   P"<<auxq0.p[i].id<<"  rbcpu = "<<auxex.p[0].rbcpu;
+    cout<<"   P"<<auxq0.p[i].id;//<<"  rbcpu: "<<auxq0.p[i].rbcpu<<"  f = "<<auxq0.p[i].f<<"   ";
 }
 
 cout<<endl<<"Fila Q1:";
 for(i=0; i<auxq1.size(); i++){
-    cout<<"   P"<<auxq1.p[i].id<<"  rbcpu = "<<auxex.p[0].rbcpu;
+    cout<<"   P"<<auxq1.p[i].id;//<<"  rbcpu: "<<auxq1.p[i].rbcpu<<"  f = "<<auxq1.p[i].f<<"   ";
 }
 
 cout<<endl<<"Fila E/S:";
@@ -323,6 +324,18 @@ q1.update(idex);
 
 es.update();
 
+
+///tratando Q1
+q1.elapsedTime(q0); ///analisa se há processos em Q1 esperando há 30ms e os desloca de Q1 para Q0
+
+///tratando E/S
+if(!es.empty()){
+    if(es.fex()){ ///processo executando E/S terminou sua operação
+        es.moveEStoQ0(q0);
+    }
+}
+
+
 ///tratando ex
 if(!ex.empty()) { ///existe processo em execução
 
@@ -354,20 +367,13 @@ ex.replaceInQ1(q1); ///atualiza os parâmetros do processo em Q1 e retira process
 
 }
 
-///tratando Q1
-q1.elapsedTime(q0); ///analisa se há processos em Q1 esperando há 30ms e os desloca de Q1 para Q0
-
-///tratando E/S
-if(!es.empty()){
-    if(es.fex()){ ///processo executando E/S terminou sua operação
-        es.moveEStoQ0(q0);
-    }
-}
 
 if(ex.empty()){ ///ninguém está em execução
     if(!q0.empty()){
         aux = q0.p[0];
+        if(aux.rbcpu==0){
         aux.rbcpu = aux.bcpu;
+    }
     }
     else if(!q1.empty()){
         aux = q1.p[0];
