@@ -358,9 +358,6 @@ q1.update(idex);
 es.update();
 
 
-///tratando Q1
-q1.elapsedTime(q0); ///analisa se há processos em Q1 esperando há 30ms e os desloca de Q1 para Q0
-
 ///tratando E/S
 if(!es.empty()){
     if(es.fex()){ ///processo executando E/S terminou sua operação
@@ -368,6 +365,8 @@ if(!es.empty()){
     }
 }
 
+///tratando Q1
+q1.elapsedTime(q0); ///analisa se há processos em Q1 esperando há 30ms e os desloca de Q1 para Q0
 
 ///tratando ex
 if(!ex.empty()) { ///existe processo em execução
