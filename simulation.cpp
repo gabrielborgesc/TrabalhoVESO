@@ -317,7 +317,7 @@ for(i=0; i<qtproc; i++){ ///pegar qtd de E/S de cada processo
     }
 
 for(i=0; i<qtproc; i++){ ///criando os processos e adicionando-os à fila Q0
-    aux.id = i+1;
+    aux.id = i;
     aux.bcpu = aux.rbcpu = dscpu[i];
     aux.qes = aux.res = qesp[i];
     aux.f = Q0;
