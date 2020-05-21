@@ -124,7 +124,7 @@ public:
         proc paux = p[0];
         paux.res--;
         p.erase(p.begin());
-        if(!p.empty()){
+        if(!p.empty()){ ///setando tempo de inicio de operação de E/S após o anterior ter ido para Q0.
             p[0].ties = t;
         }
         paux.f = Q0;
@@ -148,7 +148,7 @@ public:
     }
 
     bool stop(fila0 q0) { ///método que indica se processo em execução é de Q1 e deve ser interrompido porque chegou processo em Q0
-        return !p.empty() && !q0.empty() && (p[0].id != q0.p[0].id) && (p[0].f = Q1);
+        return !p.empty() && !q0.empty() && (p[0].id != q0.p[0].id) && (p[0].f == Q1);
     }
 
     void update() {
@@ -331,7 +331,6 @@ cout<<endl<<endl;
         aux.tiex = t;
         ex.ins(aux);
 
-///print(q0, q1, ex, es, term, auxq0, auxq1, auxex, auxes, auxterm);
 
 while(1){
 t++;
@@ -344,6 +343,8 @@ auxq1 = q1;
 auxex = ex;
 auxes = es;
 auxterm = term;
+
+
 ///atualizando tempos de execução/espera
 ex.update();
 
@@ -359,7 +360,7 @@ es.update();
 
 
 ///tratando E/S
-if(!es.empty()){
+if(!es.empty()){ ///existe pelo menos algum processo em E/S
     if(es.fex()){ ///processo executando E/S terminou sua operação
         es.moveEStoQ0(q0);
     }
@@ -376,7 +377,7 @@ ex.moveQ0toQ1(q0, q1); ///move processo da fila Q0 para Q1
 }
 
 else if(ex.fexQ0()){ ///processo que está em execução é de Q0 e temrinou por bcpu
-if(ex.p[0].res!=0){
+if(ex.p[0].res!=0){ ///processo ainda tem operação de E/S para executar
 ex.moveQtoES(q0, es); ///move processo da fila Q0 para executar operação de E/S
 }
 else{
@@ -385,7 +386,7 @@ ex.moveQtoTerm(q0, term); ///move processo da fila Q0 para fila de terminados
 }
 
 else if(ex.fexQ1()){ ///processo que está em execução é de Q1 e temrinou por bcpu
-if(ex.p[0].res!=0){
+if(ex.p[0].res!=0){ ///processo ainda tem operação de E/S para executar
 ex.moveQtoES(q1, es); ///move processo da fila Q1 para executar operação de E/S
 }
 else{
@@ -400,11 +401,11 @@ ex.replaceInQ1(q1); ///atualiza os parâmetros do processo em Q1 e retira process
 }
 
 
-if(ex.empty()){ ///ninguém está em execução
+if(ex.empty()){ ///ninguém está em execução após terem sido feitas as conferências/mudanças acima
     if(!q0.empty()){
         aux = q0.p[0];
         if(aux.rbcpu==0){
-        aux.rbcpu = aux.bcpu;
+        aux.rbcpu = aux.bcpu; ///reseta burst restante
     }
     }
     else if(!q1.empty()){
